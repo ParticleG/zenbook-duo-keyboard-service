@@ -1,0 +1,16 @@
+[Unit]
+Description=ASUS Zenbook Duo Keyboard Backlight Service
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/keyboard-service -c /etc/keyboard-service/hypr_monitor.conf
+Restart=on-failure
+StandardOutput=journal
+StandardError=journal
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

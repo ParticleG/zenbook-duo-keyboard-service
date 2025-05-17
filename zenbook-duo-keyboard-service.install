@@ -1,0 +1,40 @@
+#!/bin/bash
+
+post_install() {
+  echo ">>> 安装完成！"
+  echo ">>> 要启用服务，请运行："
+  echo ">>>   sudo systemctl enable --now zenbook-duo-keyboard.service"
+  echo ">>> 使用以下命令控制键盘背光："
+  echo ">>>   keyboard-control [0|1|2|3|cycle]"
+  
+  # 创建运行时目录（如果不存在）
+  mkdir -p /run/keyboard-service
+  chmod 755 /run/keyboard-service
+}
+
+post_upgrade() {
+  post_install
+  
+  # 如果服务正在运行，重启它以应用更新
+  if systemctl is-active --quiet zenbook-duo-keyboard.service; then
+    echo ">>> 重新启动服务以应用更新..."
+    systemctl restart zenbook-duo-keyboard.service
+  fi
+}
+
+pre_remove() {
+  # 在卸载前停止服务
+  echo ">>> 正在停止服务..."
+  systemctl stop zenbook-duo-keyboard.service >/dev/null 2>&1
+  systemctl disable zenbook-duo-keyboard.service >/dev/null 2>&1
+}
+
+post_remove() {
+  # 清理运行时文件
+  echo ">>> 清理残留文件..."
+  rm -rf /run/keyboard-service
+  
+  # 告知用户关于配置文件
+  echo ">>> 注意：配置文件 /etc/keyboard-service/ 和状态文件 /var/lib/keyboard-service/ 未被删除。"
+  echo ">>> 如果您不再需要它们，请手动删除这些目录。"
+}

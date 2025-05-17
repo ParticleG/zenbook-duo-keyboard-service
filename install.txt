@@ -1,0 +1,43 @@
+INSTALLATION INSTRUCTIONS
+========================
+
+## Building from Source
+
+1. Extract the source package:
+   tar -xzf zenbook-duo-keyboard-backlight-1.0.0.tar.gz
+   
+2. Change to the package directory:
+   cd zenbook-duo-keyboard-backlight
+
+3. Build and install the package:
+   makepkg -si
+
+## After Installation
+
+1. Enable and start the service:
+   sudo systemctl enable --now keyboard-backlight.service
+
+2. Control the keyboard backlight:
+   keyboard-backlight [0|1|2|3|cycle]
+   
+   Where:
+   - 0-3: Set specific backlight level (0=off, 3=brightest)
+   - cycle: Cycle through all backlight levels
+
+The service will automatically restore the last backlight level when the keyboard is connected.
+
+## Configuration
+
+The monitor configuration file is located at /etc/keyboard-backlight/hypr_monitor.conf
+
+## Package Structure
+
+zenbook-duo-keyboard-backlight/
+├── PKGBUILD                # Package build script
+├── README.md               # Project documentation
+├── LICENSE                 # License information
+├── install.txt             # This installation guide
+└── src/                    # Source code directory
+    ├── keyboard_service.c       # Main service implementation
+    ├── keyboard_control.sh      # Command line interface
+    └── keyboard_service.service # Systemd service file
