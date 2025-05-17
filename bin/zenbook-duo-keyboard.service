@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/keyboard-service -c /etc/keyboard-service/hypr_monitor.conf
+ExecStart=/usr/bin/keyboard-service -c /etc/keyboard-service/hypr_monitor.conf
 Restart=on-failure
 StandardOutput=journal
 StandardError=journal

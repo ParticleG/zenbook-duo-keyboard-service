@@ -14,18 +14,18 @@ sha256sums=('SKIP')
 install=$pkgname.install
 
 prepare() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/$pkgname"
   mkdir -p build
 }
 
 build() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/$pkgname"
   gcc -Wall -o build/service src/service.c -lusb-1.0
   cp -r bin/* build/
 }
 
 package() {
-  cd "$srcdir/$pkgname-$pkgver"
+  cd "$srcdir/$pkgname"
   
   # Create directories
   install -dm755 "$pkgdir/usr/bin"
@@ -38,11 +38,11 @@ package() {
   install -m755 "build/control.sh" "$pkgdir/usr/bin/keyboard-control"
   install -m644 "build/zenbook-duo-keyboard.service" "$pkgdir/usr/lib/systemd/system/zenbook-duo-keyboard.service"
   
+  # Install configuration file
+  install -m644 "etc/hypr_monitor.conf" "$pkgdir/etc/keyboard-service/hypr_monitor.conf"
+  
   # Install documentation
   install -dm755 "$pkgdir/usr/share/doc/$pkgname"
   install -m644 "README.md" "$pkgdir/usr/share/doc/$pkgname/"
   install -m644 "LICENSE" "$pkgdir/usr/share/doc/$pkgname/"
-  
-  # Create default config file
-  echo "# Default monitor config for Zenbook Duo" > "$pkgdir/etc/keyboard-service/hypr_monitor.conf"
 }
