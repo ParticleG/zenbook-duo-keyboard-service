@@ -1,13 +1,13 @@
 #!/bin/bash
 
 post_install() {
-  echo ">>> 安装完成！"
-  echo ">>> 要启用服务，请运行："
+  echo ">>> Installation complete!"
+  echo ">>> To enable the service, run:"
   echo ">>>   sudo systemctl enable --now zenbook-duo-keyboard.service"
-  echo ">>> 使用以下命令控制键盘背光："
+  echo ">>> Use the following command to control keyboard backlight:"
   echo ">>>   keyboard-control [0|1|2|3|cycle]"
   
-  # 创建运行时目录（如果不存在）
+  # Create runtime directory (if it doesn't exist)
   mkdir -p /run/keyboard-service
   chmod 755 /run/keyboard-service
 }
@@ -15,26 +15,26 @@ post_install() {
 post_upgrade() {
   post_install
   
-  # 如果服务正在运行，重启它以应用更新
+  # If the service is running, restart it to apply updates
   if systemctl is-active --quiet zenbook-duo-keyboard.service; then
-    echo ">>> 重新启动服务以应用更新..."
+    echo ">>> Restarting service to apply updates..."
     systemctl restart zenbook-duo-keyboard.service
   fi
 }
 
 pre_remove() {
-  # 在卸载前停止服务
-  echo ">>> 正在停止服务..."
+  # Stop the service before uninstallation
+  echo ">>> Stopping service..."
   systemctl stop zenbook-duo-keyboard.service >/dev/null 2>&1
   systemctl disable zenbook-duo-keyboard.service >/dev/null 2>&1
 }
 
 post_remove() {
-  # 清理运行时文件
-  echo ">>> 清理残留文件..."
+  # Clean up runtime files
+  echo ">>> Cleaning up remaining files..."
   rm -rf /run/keyboard-service
   
-  # 告知用户关于配置文件
-  echo ">>> 注意：配置文件 /etc/keyboard-service/ 和状态文件 /var/lib/keyboard-service/ 未被删除。"
-  echo ">>> 如果您不再需要它们，请手动删除这些目录。"
+  # Inform the user about configuration files
+  echo ">>> Note: Configuration files in /etc/keyboard-service/ and state files in /var/lib/keyboard-service/ have not been removed."
+  echo ">>> If you no longer need them, please manually delete these directories."
 }

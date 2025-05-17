@@ -1,100 +1,100 @@
 # zenbook-duo-keyboard-service
 
-## 项目简介
+## Project Introduction
 
-这是一个为华硕Zenbook Duo笔记本电脑设计的键盘背光服务。本服务能够监控键盘连接状态，控制键盘背光亮度级别，并在键盘重新连接时自动恢复之前的背光设置。
+This is a keyboard backlight service designed for ASUS Zenbook Duo laptops. This service can monitor keyboard connection status, control keyboard backlight brightness levels, and automatically restore previous backlight settings when the keyboard reconnects.
 
-## 功能特点
+## Features
 
-- 自动检测键盘连接/断开状态
-- 支持4级背光调节（0-3级）
-- 支持循环切换背光级别
-- 自动保存上次设置的背光级别
-- 在键盘重新连接时自动恢复背光设置
-- 支持自定义显示器配置（适用于Hyprland窗口管理器）
+- Automatically detect keyboard connection/disconnection status
+- Support for 4 levels of backlight adjustment (levels 0-3)
+- Support for cycling through backlight levels
+- Automatically save the last set backlight level
+- Automatically restore backlight settings when the keyboard reconnects
+- Support for custom monitor configuration (for Hyprland window manager)
 
-## 系统要求
+## System Requirements
 
-- Arch Linux 或基于Arch的发行版
-- libusb库
+- Arch Linux or Arch-based distributions
+- libusb library
 - systemd
 
-## 安装方法
+## Installation
 
-### 通过AUR安装
+### Installing via AUR
 
 ```bash
-# 使用yay
+# Using yay
 yay -S zenbook-duo-keyboard-service
 
-# 或使用paru
+# Or using paru
 paru -S zenbook-duo-keyboard-service
 ```
 
-### 从源码编译安装
+### Building and Installing from Source
 
-1. 下载源码包
+1. Download the source package
    ```bash
    git clone https://github.com/ParticleG/zenbook-duo-keyboard-service.git
    cd zenbook-duo-keyboard-service
    ```
 
-2. 构建并安装
+2. Build and install
    ```bash
    makepkg -si
    ```
 
-## 使用方法
+## Usage
 
-### 启动服务
+### Starting the Service
 
 ```bash
 sudo systemctl enable --now zenbook-duo-keyboard.service
 ```
 
-### 控制键盘背光
+### Controlling the Keyboard Backlight
 
 ```bash
 keyboard-control [0|1|2|3|cycle]
 ```
 
-参数说明：
-- `0` - 关闭背光
-- `1` - 低亮度
-- `2` - 中亮度
-- `3` - 高亮度
-- `cycle` - 循环切换所有亮度级别
+Parameter description:
+- `0` - Turn off backlight
+- `1` - Low brightness
+- `2` - Medium brightness
+- `3` - High brightness
+- `cycle` - Cycle through all brightness levels
 
-## 配置文件
+## Configuration File
 
-配置文件位于 `/etc/keyboard-service/hypr_monitor.conf`，用于控制当键盘连接/断开时Hyprland的显示器配置。
+The configuration file is located at `/etc/keyboard-service/hypr_monitor.conf`, used to control Hyprland's monitor configuration when the keyboard is connected/disconnected.
 
-默认配置：
-- 当键盘连接时：禁用eDP-2显示器
-- 当键盘断开时：启用eDP-2显示器（高分辨率，缩放1.5）
+Default configuration:
+- When keyboard is connected: Disable eDP-2 monitor
+- When keyboard is disconnected: Enable eDP-2 monitor (high resolution, 1.5 scaling)
 
-## 工作原理
+## How It Works
 
-1. 服务监控USB设备事件，检测特定的Zenbook Duo键盘（VendorID: 0x0b05, ProductID: 0x1b2c）
-2. 通过libusb库发送控制命令来调整键盘背光
-3. 背光设置保存在 `/var/lib/keyboard-service/backlight-level` 文件中
-4. 使用命名管道 `/run/keyboard-service/fifo` 接收命令
+1. The service monitors USB device events, detecting the specific Zenbook Duo keyboard (VendorID: 0x0b05, ProductID: 0x1b2c)
+2. Sends control commands through the libusb library to adjust the keyboard backlight
+3. Backlight settings are saved in the `/var/lib/keyboard-service/backlight-level` file
+4. Uses a named pipe `/run/keyboard-service/fifo` to receive commands
 
-## 卸载
+## Uninstallation
 
 ```bash
 sudo pacman -R zenbook-duo-keyboard-service
 ```
 
-卸载后，配置文件和状态文件不会被自动删除。如果需要完全清除，请手动删除：
+After uninstallation, configuration files and state files are not automatically deleted. If you need to completely remove them, please manually delete:
 ```bash
 sudo rm -rf /etc/keyboard-service /var/lib/keyboard-service
 ```
 
-## 许可证
+## License
 
-本项目采用GPL许可证。详情请参阅LICENSE文件。
+This project is licensed under the GPL License. See the LICENSE file for details.
 
-## 作者
+## Author
 
 ParticleG <particle_g@outlook.com>
