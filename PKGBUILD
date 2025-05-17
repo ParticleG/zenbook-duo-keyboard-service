@@ -10,7 +10,7 @@ license=('GPL')
 depends=('libusb')
 makedepends=('gcc')
 source=("$pkgname-$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('5e998618f59a0e73720aaaae8a5a8014cced0925af964f46534036b176d3efb4')
 install=$pkgname.install
 
 prepare() {
