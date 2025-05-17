@@ -5,7 +5,8 @@ set -e
 # Define variables
 PKG_NAME="zenbook-duo-keyboard-service"
 PKG_VERSION="1.0.0"
-BASE_DIR="/home/particleg/projects/zenbook-duo-keyboard-service"
+# 使用脚本所在目录作为项目路径，而非硬编码的用户路径
+BASE_DIR="$(dirname "$(readlink -f "$0")")"
 SOURCE_DIR="$BASE_DIR/$PKG_NAME"
 TEMP_DIR="/tmp/$PKG_NAME-build"
 
@@ -25,20 +26,44 @@ cp "$BASE_DIR/LICENSE" "$TEMP_DIR/$PKG_NAME/"
 # Create source package
 echo "Creating source package..."
 cd "$TEMP_DIR"
-tar -czf "$BASE_DIR/$PKG_NAME-$PKG_VERSION.tar.gz" "$PKG_NAME"
+# Create source package in temp directory instead of project root
+tar -czf "$TEMP_DIR/$PKG_NAME-$PKG_VERSION.tar.gz" "$PKG_NAME"
 
-# Calculate checksum and update PKGBUILD
-echo "Updating checksum in PKGBUILD..."
-SHA256SUM=$(sha256sum "$BASE_DIR/$PKG_NAME-$PKG_VERSION.tar.gz" | awk '{print $1}')
-sed -i "s/sha256sums=('SKIP')/sha256sums=('$SHA256SUM')/" "$BASE_DIR/PKGBUILD"
+# Calculate checksum
+echo "Calculating source package checksum..."
+SHA256SUM=$(sha256sum "$TEMP_DIR/$PKG_NAME-$PKG_VERSION.tar.gz" | awk '{print $1}')
+echo "Calculated checksum: $SHA256SUM"
 
-# Prepare AUR package directory
+# Prepare AUR package directory first
 echo "Preparing AUR package directory..."
 rm -rf "$BASE_DIR/aur"
 mkdir -p "$BASE_DIR/aur"
+
+# Copy files to AUR directory first, without modifying original files
+echo "Copying files to AUR directory..."
 cp "$BASE_DIR/PKGBUILD" "$BASE_DIR/aur/"
 cp "$BASE_DIR/$PKG_NAME.install" "$BASE_DIR/aur/"
-cp "$BASE_DIR/$PKG_NAME-$PKG_VERSION.tar.gz" "$BASE_DIR/aur/"
+# Move source package to AUR directory
+mv "$TEMP_DIR/$PKG_NAME-$PKG_VERSION.tar.gz" "$BASE_DIR/aur/"
+
+# Now update PKGBUILD in AUR directory
+echo "Updating checksum in AUR directory's PKGBUILD..."
+if grep -q "sha256sums=" "$BASE_DIR/aur/PKGBUILD"; then
+    # Use generic regex to replace any format of sha256sums line
+    sed -i -E "s/sha256sums=\(['\"]?[^)]*['\"]?\)/sha256sums=('$SHA256SUM')/" "$BASE_DIR/aur/PKGBUILD"
+    echo "Replaced sha256sums in AUR directory's PKGBUILD with new value"
+else
+    echo "Warning: Could not find sha256sums line in PKGBUILD, adding manually"
+    echo "sha256sums=('$SHA256SUM')" >> "$BASE_DIR/aur/PKGBUILD"
+fi
+
+# Verify successful replacement
+if grep -q "$SHA256SUM" "$BASE_DIR/aur/PKGBUILD"; then
+    echo "Checksum successfully updated in AUR directory's PKGBUILD"
+else
+    echo "Error: Could not update checksum in AUR directory's PKGBUILD"
+    exit 1
+fi
 
 # Generate .SRCINFO file
 echo "Generating .SRCINFO file..."
